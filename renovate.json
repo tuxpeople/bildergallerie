@@ -1,71 +1,15 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "assignees": [
-    "tuxpeople"
-  ],
   "extends": [
-    "config:recommended",
-    "helpers:pinGitHubActionDigests"
-  ],
-  "dependencyDashboard": true,
-  "dependencyDashboardTitle": "Renovate Dashboard 🤖",
-  "suppressNotifications": [
-    "prEditedNotification",
-    "prIgnoreNotification"
-  ],
-  "rebaseWhen": "conflicted",
-  "dockerfile": {
-    "enabled": true
-  },
-  "customManagers": [
-    {
-      "customType": "regex",
-      "description": "Versions annotated with a `# renovate:` comment in workflows and Dockerfiles",
-      "managerFilePatterns": [
-        "/(^|/)\\.github/workflows/[^/]+\\.ya?ml$/",
-        "/(^|/)Dockerfile[^/]*$/"
-      ],
-      "matchStrings": [
-        "#\\s*renovate:\\s*datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)(\\s+versioning=(?<versioning>\\S+))?\\s*\\n\\s*(?:ARG\\s+|ENV\\s+)?[A-Za-z0-9_-]+\\s*[:=]\\s*[\"']?(?<currentValue>[^\\s\"']+)"
-      ],
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver-coerced{{/if}}"
-    }
+    "github>tuxpeople/shared//renovate/renovate.json5",
+    "github>tuxpeople/shared//renovate/minimumReleaseAge.json5"
   ],
   "packageRules": [
     {
-      "matchCategories": [
-        "docker"
-      ],
-      "enabled": true,
-      "pinDigests": false
-    },
-    {
-      "description": "Automerge patch, minor and digest updates once the PR checks (Ruff, Pytest, Hadolint, smoke test, Trivy) pass",
-      "matchUpdateTypes": [
-        "patch",
-        "minor",
-        "digest",
-        "pinDigest"
-      ],
-      "automerge": true
-    },
-    {
-      "description": "Major updates need a manual review",
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "automerge": false
-    },
-    {
-      "description": "Wait 3 days before proposing new releases, so a compromised or broken release can be pulled first. Docker digests have no release timestamp and are excluded.",
-      "matchDatasources": [
-        "pypi",
-        "github-releases",
-        "github-tags",
-        "github-digest"
-      ],
-      "minimumReleaseAge": "3 days"
+      "description": "Updates that change the image are released: release-please only releases visible changelog types, and `deps` is one (chore is hidden). GitHub Actions and dev tools stay chore(deps) without a release.",
+      "matchFileNames": ["Dockerfile", "requirements.txt"],
+      "semanticCommitType": "deps",
+      "semanticCommitScope": null
     }
-  ],
-  "platformAutomerge": false
+  ]
 }
