@@ -1,0 +1,110 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-test:
+    name: Ruff + Pytest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version-file: pyproject.toml
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      # The S rules (flake8-bandit) flag Flask's debug mode and similar issues
+      - name: Run Ruff lint
+        run: ruff check .
+
+      - name: Run Ruff format check
+        run: ruff format --check .
+
+      - name: Run pytest
+        run: pytest -v
+
+  hadolint:
+    name: Dockerfile Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Run Hadolint
+        uses: hadolint/hadolint-action@06be81baf89a55ffd0e24b8f04a4185738dd3387 # v3.5.0
+        with:
+          dockerfile: Dockerfile
+          failure-threshold: error
+
+  image-test:
+    name: Image Smoke Test + Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - name: Build image (local only, no push, native arch)
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          push: false
+          load: true
+          tags: bildergallerie:test
+
+      # Run it like in Kubernetes (read-only root, foreign UID, no
+      # capabilities) and check the endpoints from outside, including the
+      # path traversal that was exploitable before 2.0.0
+      - name: Smoke test
+        run: |
+          mkdir -p "$RUNNER_TEMP/pictures/sub" && printf 'x' > "$RUNNER_TEMP/pictures/sub/a.jpg"
+          docker run -d --name gallery -p 8080:8080 \
+            --read-only --tmpfs /dev/shm --user 65534:65534 --cap-drop ALL \
+            -v "$RUNNER_TEMP/pictures:/pictures:ro" bildergallerie:test
+          trap 'docker logs gallery; docker rm -f gallery >/dev/null' EXIT
+
+          for i in $(seq 1 30); do
+            curl -fs -o /dev/null http://localhost:8080/ && break
+            sleep 1
+          done
+
+          check() {
+            local path="$1" expected="$2" code
+            code=$(curl -s -o /tmp/body -w '%{http_code}' --path-as-is "http://localhost:8080${path}")
+            if [[ "$code" != "$expected" ]] || grep -q -E 'root:x:|Werkzeug Debugger' /tmp/body; then
+              echo "::error::${path}: got ${code}, expected ${expected}"
+              exit 1
+            fi
+            echo "✅ ${path} -> ${code}"
+          }
+          check / 200
+          check /sub 200
+          check /image/sub/a.jpg 200
+          check /image/..%2f..%2fetc%2fpasswd 404
+          check /image/%2e%2e/%2e%2e/etc/passwd 404
+          check /..%2f..%2fapp 404
+          check /image/missing.jpg 404
+
+      - name: Scan image for vulnerabilities
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: bildergallerie:test
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
