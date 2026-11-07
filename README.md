@@ -51,12 +51,15 @@ volumes:
 
 ```bash
 cosign verify \
-  --certificate-identity "https://github.com/tuxpeople/bildergallerie/.github/workflows/release.yml@refs/heads/main" \
+  --certificate-identity-regexp '^https://github\.com/tuxpeople/shared/\.github/workflows/container-release\.yml@' \
+  --certificate-github-workflow-repository tuxpeople/bildergallerie \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
   ghcr.io/tuxpeople/bildergallerie:latest
 
 gh attestation verify oci://ghcr.io/tuxpeople/bildergallerie:latest --owner tuxpeople
 ```
+
+Images up to 2.0.0 were signed by the release workflow of this repository (`--certificate-identity "https://github.com/tuxpeople/bildergallerie/.github/workflows/release.yml@refs/heads/main"`).
 
 ## Development
 
