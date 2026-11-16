@@ -4,7 +4,7 @@
 # DL3007: Chainguard only publishes `latest` tags for free. The digest is
 # pinned, so Renovate proposes base image updates as PRs that have to pass CI.
 # hadolint ignore=DL3007
-FROM cgr.dev/chainguard/python:latest-dev@sha256:2f28d53bc0da2b0dcaabc5fc7aab2a69730466a9da4ffaa9bcf3019c3ff9905a AS build
+FROM cgr.dev/chainguard/python:latest-dev@sha256:e0df0ab3cb72380c82f8c5513538152e822a6d8994252663060adea9fdc450c2 AS build
 
 # The venv lives in /opt/venv, not in /home/nonroot (mode 0700): Kubernetes
 # may run the pod as a different UID (e.g. runAsUser: 65534), which must
