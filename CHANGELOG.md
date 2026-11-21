@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.0.3](https://github.com/tuxpeople/bildergallerie/compare/v2.0.2...v2.0.3) (2026-11-21)
+
+
+### Dependencies
+
+* update image cgr.dev/chainguard/python to 120fda9 ([#39](https://github.com/tuxpeople/bildergallerie/issues/39)) ([c70798b](https://github.com/tuxpeople/bildergallerie/commit/c70798b1972b43941e58dd075034a6ae560d1515))
+* update image cgr.dev/chainguard/python to 2f258a1 ([#41](https://github.com/tuxpeople/bildergallerie/issues/41)) ([da60d6f](https://github.com/tuxpeople/bildergallerie/commit/da60d6fb99f1f4de61b254700553cb04dec0ad58))
+* update image cgr.dev/chainguard/python to 4b2cec0 ([#42](https://github.com/tuxpeople/bildergallerie/issues/42)) ([dbc107d](https://github.com/tuxpeople/bildergallerie/commit/dbc107ddb3f5652c014f87b8be1b1a081a3dc39e))
+* update image cgr.dev/chainguard/python to 6a46760 ([#36](https://github.com/tuxpeople/bildergallerie/issues/36)) ([530a472](https://github.com/tuxpeople/bildergallerie/commit/530a472b6fd1c09f4220cb36832c687f32b79f15))
+* update image cgr.dev/chainguard/python to 88d8715 ([#37](https://github.com/tuxpeople/bildergallerie/issues/37)) ([3272b4d](https://github.com/tuxpeople/bildergallerie/commit/3272b4d9f2ee4d57d406fc4f904c886af5ff890e))
+* update image cgr.dev/chainguard/python to c047e6d ([#43](https://github.com/tuxpeople/bildergallerie/issues/43)) ([9c86a27](https://github.com/tuxpeople/bildergallerie/commit/9c86a270267f8c433c3037fd559f1a69425d297d))
+* update image cgr.dev/chainguard/python to d914788 ([#40](https://github.com/tuxpeople/bildergallerie/issues/40)) ([f54acd9](https://github.com/tuxpeople/bildergallerie/commit/f54acd994782e96630aec80eaf3e6e3e7350303f))
+* update image cgr.dev/chainguard/python to f6e5c2e ([#44](https://github.com/tuxpeople/bildergallerie/issues/44)) ([cd3337f](https://github.com/tuxpeople/bildergallerie/commit/cd3337ff6a180712a0c136473b46888a92dc945b))
+
 ## [2.0.2](https://github.com/tuxpeople/bildergallerie/compare/v2.0.1...v2.0.2) (2026-11-16)
 
 
